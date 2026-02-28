@@ -208,6 +208,7 @@ function initGame() {
   prevAtLeftWall = false
   prevAtRightWall = false
   mouseX = 0
+  gameStartTime = Date.now()
   canvas.style.filter = ''
   document.getElementById('crt-overlay').style.display = 'none'
   stopFilmNoise()
@@ -251,7 +252,7 @@ function loseLife() {
     gameState = 'gameover'
     muffleMusic()
     SFX.gameOver()
-    saveScore(score)
+    saveScore(score, Date.now() - gameStartTime, false)
     document.getElementById('final-score').textContent = score
     renderEndDrops('gameover-drops')
     renderScoreboard('gameover-scoreboard', score)
@@ -282,8 +283,10 @@ function checkWin() {
     gameState = 'win'
     stopMusic()
     SFX.win()
-    saveScore(score)
+    const elapsedMs = Date.now() - gameStartTime
+    saveScore(score, elapsedMs, true)
     document.getElementById('win-score').textContent = score
+    document.getElementById('win-time').textContent = fmtTime(elapsedMs)
     renderEndDrops('win-drops')
     renderScoreboard('win-scoreboard', score)
     document.getElementById('win-screen').style.display = 'flex'
@@ -759,6 +762,7 @@ function animate(now) {
   updateTrails()
   updateShake()
   draw()
+  updateTimer()
 }
 
 // ═══ INPUT ═══

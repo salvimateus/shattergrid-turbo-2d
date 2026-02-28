@@ -8,9 +8,26 @@ function loadScores() {
   } catch (e) { return [] }
 }
 
-function saveScore(pts) {
+function fmtTime(ms) {
+  const totalSec = Math.floor(ms / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  const mil = ms % 1000
+  return `${m}:${String(s).padStart(2, '0')}.${String(mil).padStart(3, '0')}`
+}
+
+function fmtTimeShort(ms) {
+  const totalSec = Math.floor(ms / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+function saveScore(pts, timeMs, win) {
   const scores = loadScores()
-  scores.push({ score: pts, date: Date.now() })
+  const entry = { score: pts, date: Date.now(), win: !!win }
+  if (timeMs !== undefined) entry.time = timeMs
+  scores.push(entry)
   if (scores.length > 100) scores.splice(0, scores.length - 100)
   try { localStorage.setItem(SCORE_STORAGE_KEY, JSON.stringify(scores)) } catch (e) {}
 }
@@ -30,7 +47,9 @@ function renderScoreboard(containerId, highlightScore) {
     let h = `<div class="scoreboard-title">${title}</div>`
     list.forEach((e, i) => {
       const hl = (highlightScore !== undefined && e.score === highlightScore) ? ' highlight' : ''
-      h += `<div class="scoreboard-entry${hl}"><span class="sb-rank">${i + 1}.</span><span class="sb-score">${e.score}</span><span class="sb-date">${fmtDate(e.date)}</span></div>`
+      const icon = e.win ? '<span class="sb-result sb-win">🏆</span>' : '<span class="sb-result sb-over">💀</span>'
+      const timeStr = e.time !== undefined ? `<span class="sb-time">⏱ ${fmtTime(e.time)}</span>` : ''
+      h += `<div class="scoreboard-entry${hl}">${icon}<span class="sb-rank">${i + 1}.</span><span class="sb-score">${e.score}</span>${timeStr}<span class="sb-date">${fmtDate(e.date)}</span></div>`
     })
     return h
   }
@@ -38,4 +57,3 @@ function renderScoreboard(containerId, highlightScore) {
 }
 
 renderScoreboard('start-scoreboard')
-

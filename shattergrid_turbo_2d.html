@@ -14,6 +14,7 @@ canvas{display:block;}
 #hud{position:absolute;top:20px;display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-family:'Orbitron',monospace;color:#0ff;text-shadow:0 0 10px #0ff,0 0 20px #0ff;}
 #score-label,#lives-label,#combo-label{font-size:11px;letter-spacing:3px;opacity:0.6;text-transform:uppercase;}
 #score-value,#lives-value,#combo-value{font-size:28px;font-weight:900;}
+#timer-value{font-size:11px;letter-spacing:2px;opacity:0.75;margin-top:2px;color:#0ff;}
 #combo-container{text-align:center;color:#f0f;text-shadow:0 0 10px #f0f,0 0 20px #f0f;}
 #lives-container{text-align:right;color:#0f0;text-shadow:0 0 10px #0f0,0 0 20px #0f0;}
 .hud-group{min-width:120px;}
@@ -35,7 +36,7 @@ canvas{display:block;}
 #powerup-popup.show{animation:popup-anim 1s ease-out forwards;}
 @keyframes popup-anim{0%{opacity:1;transform:translate(-50%,-50%) scale(0.5);}20%{opacity:1;transform:translate(-50%,-50%) scale(1.3);}40%{opacity:1;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-60%) scale(0.9);}}
 @keyframes life-anim{0%{opacity:1;transform:translate(-50%,-50%) scale(2);}15%{opacity:1;transform:translate(-50%,-50%) scale(1);}70%{opacity:0.8;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-55%) scale(0.8);}}
-@media(max-width:600px){.title{font-size:28px;letter-spacing:3px;}.subtitle{font-size:12px;letter-spacing:6px;margin-bottom:30px;}.prompt{font-size:12px;letter-spacing:3px;}.final-score{font-size:32px;}#score-label,#lives-label,#combo-label{font-size:8px;letter-spacing:1.5px;}#score-value,#lives-value,#combo-value{font-size:18px;}.hud-group{min-width:60px;}#combo-popup{font-size:28px!important;}#life-lost-popup{font-size:22px;}#powerup-popup{font-size:18px;}#hud{padding:0 4px;top:10px;}}
+@media(max-width:600px){.title{font-size:28px;letter-spacing:3px;}.subtitle{font-size:12px;letter-spacing:6px;margin-bottom:30px;}.prompt{font-size:12px;letter-spacing:3px;}.final-score{font-size:32px;}#score-label,#lives-label,#combo-label{font-size:8px;letter-spacing:1.5px;}#score-value,#lives-value,#combo-value{font-size:18px;}.hud-group{min-width:60px;}#combo-popup{font-size:28px!important;}#life-lost-popup{font-size:22px;}#powerup-popup{font-size:18px;}#hud{padding:0 4px;top:10px;}#timer-value{font-size:9px;}}
 @media(max-width:380px){.title{font-size:22px;letter-spacing:2px;}.subtitle{font-size:10px;letter-spacing:4px;}#score-value,#lives-value,#combo-value{font-size:15px;}#score-label,#lives-label,#combo-label{font-size:7px;letter-spacing:1px;}.hud-group{min-width:45px;}#combo-popup{font-size:22px!important;}#life-lost-popup{font-size:18px;}#powerup-popup{font-size:14px;}}
 #crt-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.35) 0px,rgba(0,0,0,0.35) 1px,transparent 1px,transparent 3px),repeating-linear-gradient(90deg,rgba(0,255,100,0.03) 0px,rgba(0,255,100,0.03) 2px,transparent 2px,transparent 4px);animation:crt-flicker 0.06s infinite;}
 #crt-overlay::after{content:'';position:absolute;top:-2%;left:-2%;width:104%;height:104%;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%);border-radius:18px;}
@@ -60,7 +61,7 @@ canvas{display:block;}
 .scoreboard-col{min-width:140px;max-height:35vh;overflow-y:auto;scrollbar-width:none;}.scoreboard-col::-webkit-scrollbar{display:none;}
 .scoreboard-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#0ff;margin-bottom:6px;text-align:center;text-shadow:0 0 8px #0ff;}
 .scoreboard-entry{font-family:'Rajdhani',sans-serif;font-size:14px;color:#aab;padding:2px 8px;margin-bottom:1px;border-left:2px solid #334;display:flex;justify-content:space-between;gap:12px;}
-.scoreboard-entry .sb-rank{color:#556;min-width:20px;}.scoreboard-entry .sb-score{color:#0ff;font-weight:700;}.scoreboard-entry .sb-date{color:#556;font-size:11px;}
+.scoreboard-entry .sb-result{font-size:11px;flex-shrink:0;}.scoreboard-entry .sb-rank{color:#556;min-width:20px;}.scoreboard-entry .sb-score{color:#0ff;font-weight:700;}.scoreboard-entry .sb-time{color:#0f8;font-size:11px;}.scoreboard-entry .sb-date{color:#556;font-size:11px;}
 .scoreboard-entry.highlight{border-left-color:#f0f;color:#f0f;}.scoreboard-entry.highlight .sb-score{color:#f0f;text-shadow:0 0 6px #f0f;}
 @media(max-width:600px){.scoreboard-container{gap:10px;flex-direction:column;align-items:center;}.scoreboard-col{min-width:200px;max-height:20vh;}.scoreboard-title{font-size:9px;}.scoreboard-entry{font-size:12px;}}
 </style>
@@ -72,7 +73,7 @@ canvas{display:block;}
 <canvas id="film-noise"></canvas>
 <div id="ui-overlay">
   <div id="hud">
-    <div class="hud-group" id="score-container"><div id="score-label">Score</div><div id="score-value">0</div></div>
+    <div class="hud-group" id="score-container"><div id="score-label">Score</div><div id="score-value">0</div><div id="timer-value">0:00.000</div></div>
     <div class="hud-group" id="combo-container"><div id="combo-label">Combo</div><div id="combo-value">x1</div></div>
     <div class="hud-group" id="lives-container"><div id="lives-label">Lives</div><div id="lives-value">♥♥♥</div></div>
   </div>
@@ -100,6 +101,7 @@ canvas{display:block;}
   <div id="win-screen">
     <div class="title" style="color:#0f0;text-shadow:0 0 20px #0f0,0 0 40px #0f0,0 0 80px #0a0;">VITÓRIA</div>
     <div class="final-score" id="win-score">0</div>
+    <div id="win-time" style="font-family:'Orbitron',monospace;font-size:18px;color:#0f8;text-shadow:0 0 10px #0f8,0 0 20px #0f8;margin-top:-8px;letter-spacing:3px;">⏱ 0:00</div>
     <div class="end-drops" id="win-drops"></div>
     <div id="win-scoreboard"></div>
     <div class="prompt">Toque para jogar novamente</div>
@@ -120,8 +122,8 @@ const MAX_LIVES = 3, DROP_CHANCE = 0.65, GLASS_CHANCE = 0.12
 const CHARGE_DUR = 90
 const FIELD_MARGIN = 0.8
 
-const DISABLE_SFX   = false
-const DISABLE_MUSIC = false
+const DISABLE_SFX   = true
+const DISABLE_MUSIC = true
 
 // Mobile detection & perf tuning
 const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && innerWidth < 900)
@@ -135,6 +137,7 @@ const STEPS_PER_FRAME = 1
 // ──── state.js ────
 // ═══ STATE ═══
 let gameState = 'start', score = 0, combo = 0, lives = MAX_LIVES
+let gameStartTime = 0
 let mouseX = 0, shakeAmt = 0, shakeX = 0, shakeY = 0, frame = 0
 let paddleW = PADDLE_W_DEF
 let paddleX = 0, targetPaddleX = 0
@@ -772,7 +775,7 @@ const DROP_TYPES_ALL = [
 const DROP_VISUAL_COLORS = [0xff00ff, 0x00ffff, 0xffff00, 0xff4444, 0x44ff44, 0x4488ff, 0xff8800, 0xaa44ff, 0xff66cc, 0x66ffcc]
 const MAX_DROPS = 3
 
-const MOBILE_BLOCKED_DROPS = ['slowmo', 'fastmo', 'bw', 'old_film']
+const MOBILE_BLOCKED_DROPS = ['slowmo', 'fastmo', 'old_film']
 
 function spawnDrop(x, y) {
   if (drops.length >= MAX_DROPS) return
@@ -962,9 +965,26 @@ function loadScores() {
   } catch (e) { return [] }
 }
 
-function saveScore(pts) {
+function fmtTime(ms) {
+  const totalSec = Math.floor(ms / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  const mil = ms % 1000
+  return `${m}:${String(s).padStart(2, '0')}.${String(mil).padStart(3, '0')}`
+}
+
+function fmtTimeShort(ms) {
+  const totalSec = Math.floor(ms / 1000)
+  const m = Math.floor(totalSec / 60)
+  const s = totalSec % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+function saveScore(pts, timeMs, win) {
   const scores = loadScores()
-  scores.push({ score: pts, date: Date.now() })
+  const entry = { score: pts, date: Date.now(), win: !!win }
+  if (timeMs !== undefined) entry.time = timeMs
+  scores.push(entry)
   if (scores.length > 100) scores.splice(0, scores.length - 100)
   try { localStorage.setItem(SCORE_STORAGE_KEY, JSON.stringify(scores)) } catch (e) {}
 }
@@ -984,7 +1004,9 @@ function renderScoreboard(containerId, highlightScore) {
     let h = `<div class="scoreboard-title">${title}</div>`
     list.forEach((e, i) => {
       const hl = (highlightScore !== undefined && e.score === highlightScore) ? ' highlight' : ''
-      h += `<div class="scoreboard-entry${hl}"><span class="sb-rank">${i + 1}.</span><span class="sb-score">${e.score}</span><span class="sb-date">${fmtDate(e.date)}</span></div>`
+      const icon = e.win ? '<span class="sb-result sb-win">🏆</span>' : '<span class="sb-result sb-over">💀</span>'
+      const timeStr = e.time !== undefined ? `<span class="sb-time">⏱ ${fmtTime(e.time)}</span>` : ''
+      h += `<div class="scoreboard-entry${hl}">${icon}<span class="sb-rank">${i + 1}.</span><span class="sb-score">${e.score}</span>${timeStr}<span class="sb-date">${fmtDate(e.date)}</span></div>`
     })
     return h
   }
@@ -992,7 +1014,6 @@ function renderScoreboard(containerId, highlightScore) {
 }
 
 renderScoreboard('start-scoreboard')
-
 
 
 // ──── ui.js ────
@@ -1025,6 +1046,11 @@ function showLifeLost(r) {
   lifeEl.textContent = `${r <= 1 ? 'LAST CHANCE' : r <= 2 ? 'CAREFUL...' : 'OUCH'}  ♥×${r}`
   lifeEl.classList.remove('show'); void lifeEl.offsetWidth; lifeEl.classList.add('show')
   lifeT = setTimeout(() => lifeEl.classList.remove('show'), 1200)
+}
+
+function updateTimer() {
+  if (gameState !== 'playing') return
+  document.getElementById('timer-value').textContent = fmtTimeShort(Date.now() - gameStartTime)
 }
 
 function updateHUD() {
@@ -1091,7 +1117,6 @@ function repositionHUD() {
     logEl.style.maxHeight     = maxLogH + 'px'
   }
 }
-
 
 
 // ──── game.js ────
@@ -1305,6 +1330,7 @@ function initGame() {
   prevAtLeftWall = false
   prevAtRightWall = false
   mouseX = 0
+  gameStartTime = Date.now()
   canvas.style.filter = ''
   document.getElementById('crt-overlay').style.display = 'none'
   stopFilmNoise()
@@ -1348,7 +1374,7 @@ function loseLife() {
     gameState = 'gameover'
     muffleMusic()
     SFX.gameOver()
-    saveScore(score)
+    saveScore(score, Date.now() - gameStartTime, false)
     document.getElementById('final-score').textContent = score
     renderEndDrops('gameover-drops')
     renderScoreboard('gameover-scoreboard', score)
@@ -1379,8 +1405,10 @@ function checkWin() {
     gameState = 'win'
     stopMusic()
     SFX.win()
-    saveScore(score)
+    const elapsedMs = Date.now() - gameStartTime
+    saveScore(score, elapsedMs, true)
     document.getElementById('win-score').textContent = score
+    document.getElementById('win-time').textContent = fmtTime(elapsedMs)
     renderEndDrops('win-drops')
     renderScoreboard('win-scoreboard', score)
     document.getElementById('win-screen').style.display = 'flex'
@@ -1856,6 +1884,7 @@ function animate(now) {
   updateTrails()
   updateShake()
   draw()
+  updateTimer()
 }
 
 // ═══ INPUT ═══
@@ -1947,4 +1976,3 @@ animate()
 </script>
 </body>
 </html>
-

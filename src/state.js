@@ -1,5 +1,6 @@
 // ═══ STATE ═══
 let gameState = 'start', score = 0, combo = 0, lives = MAX_LIVES
+let gameStartTime = 0
 let mouseX = 0, shakeAmt = 0, shakeX = 0, shakeY = 0, frame = 0
 let paddleW = PADDLE_W_DEF
 let paddleX = 0, targetPaddleX = 0

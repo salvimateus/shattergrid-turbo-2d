@@ -29,6 +29,11 @@ function showLifeLost(r) {
   lifeT = setTimeout(() => lifeEl.classList.remove('show'), 1200)
 }
 
+function updateTimer() {
+  if (gameState !== 'playing') return
+  document.getElementById('timer-value').textContent = fmtTimeShort(Date.now() - gameStartTime)
+}
+
 function updateHUD() {
   document.getElementById('score-value').textContent = score
   document.getElementById('combo-value').textContent = 'x' + Math.max(1, combo)
@@ -93,4 +98,3 @@ function repositionHUD() {
     logEl.style.maxHeight     = maxLogH + 'px'
   }
 }
-
