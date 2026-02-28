@@ -1,5 +1,5 @@
 // ═══ BOMBS ═══
-const BOMB_R = 0.25, BOMB_EXPLODE_R = 2.8, BOMB_SPEED = 0.16
+const BOMB_R = 0.25, BOMB_EXPLODE_R = 1.5, BOMB_SPEED = 0.16
 
 function launchBomb(x, y) {
   const angle = Math.PI / 2 + (Math.random() - 0.5) * 0.4
@@ -34,16 +34,21 @@ function explodeBomb(bomb) {
   spawnP(bomb.x, bomb.y, 0xff6600, 40)
   spawnP(bomb.x, bomb.y, 0xffcc00, 25)
   spawnP(bomb.x, bomb.y, 0xff2200, 20)
+  const inRange = []
   for (const br of bricks) {
     if (!br.alive) continue
     const dx = br.x - bomb.x, dy = br.y - bomb.y
-    if (Math.sqrt(dx * dx + dy * dy) < BOMB_EXPLODE_R) {
-      br.alive = false
-      if (!br.glass) aliveBrickCount--
-      score += (br.glass ? 5 : br.maxHp * 15) * 2
-      spawnP(br.x, br.y, br.color, 15)
-      if (!br.glass) spawnDrop(br.x, br.y)
-    }
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    if (dist < BOMB_EXPLODE_R) inRange.push({ br, dist })
+  }
+  inRange.sort((a, b) => a.dist - b.dist)
+  const toDestroy = inRange.slice(0, 3)
+  for (const { br } of toDestroy) {
+    br.alive = false
+    if (!br.glass) aliveBrickCount--
+    score += (br.glass ? 5 : br.maxHp * 15) * 2
+    spawnP(br.x, br.y, br.color, 15)
+    if (!br.glass) spawnDrop(br.x, br.y)
   }
   updateHUD(); checkWin()
 }
