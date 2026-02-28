@@ -1,13 +1,14 @@
 // ═══ 8-BIT SOUND ENGINE ═══
 let actx = null
 function ensureAudio() {
+  if (DISABLE_SFX) return
   if (!actx)
     actx = new (window.AudioContext || window.webkitAudioContext)()
   if (actx.state === 'suspended') actx.resume()
 }
 
 function tone(freq, dur, type = 'square', vol = 0.15, slide = 0) {
-  if (!actx) return
+  if (DISABLE_SFX || !actx) return
   const o = actx.createOscillator(),
     g = actx.createGain()
   o.type = type
@@ -26,7 +27,7 @@ function tone(freq, dur, type = 'square', vol = 0.15, slide = 0) {
 }
 
 function noise(dur, vol = 0.08) {
-  if (!actx) return
+  if (DISABLE_SFX || !actx) return
   const n = actx.sampleRate * dur,
     buf = actx.createBuffer(1, n, actx.sampleRate),
     d = buf.getChannelData(0)
@@ -107,4 +108,3 @@ const SFX = {
     setTimeout(() => tone(60, 0.2, 'square', 0.1), 150)
   },
 }
-

@@ -44,4 +44,3 @@ const sizeKB = (Buffer.byteLength(template, 'utf-8') / 1024).toFixed(1)
 console.log(`\n✅ Build complete: ${outputPath}`)
 console.log(`   Size: ${sizeKB} KB`)
 console.log(`   Modules: ${MODULE_ORDER.length}`)
-

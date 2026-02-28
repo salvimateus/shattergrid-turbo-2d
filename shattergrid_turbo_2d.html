@@ -120,6 +120,9 @@ const MAX_LIVES = 3, DROP_CHANCE = 0.65, GLASS_CHANCE = 0.12
 const CHARGE_DUR = 90
 const FIELD_MARGIN = 0.8
 
+const DISABLE_SFX   = false
+const DISABLE_MUSIC = true
+
 // Mobile detection & perf tuning
 const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && innerWidth < 900)
 const MAX_PARTICLES_CAP = 600
@@ -158,13 +161,14 @@ let spinTimer = 0, ghostTimer = 0
 // ═══ 8-BIT SOUND ENGINE ═══
 let actx = null
 function ensureAudio() {
+  if (DISABLE_SFX) return
   if (!actx)
     actx = new (window.AudioContext || window.webkitAudioContext)()
   if (actx.state === 'suspended') actx.resume()
 }
 
 function tone(freq, dur, type = 'square', vol = 0.15, slide = 0) {
-  if (!actx) return
+  if (DISABLE_SFX || !actx) return
   const o = actx.createOscillator(),
     g = actx.createGain()
   o.type = type
@@ -183,7 +187,7 @@ function tone(freq, dur, type = 'square', vol = 0.15, slide = 0) {
 }
 
 function noise(dur, vol = 0.08) {
-  if (!actx) return
+  if (DISABLE_SFX || !actx) return
   const n = actx.sampleRate * dur,
     buf = actx.createBuffer(1, n, actx.sampleRate),
     d = buf.getChannelData(0)
@@ -266,14 +270,13 @@ const SFX = {
 }
 
 
-
 // ──── music.js ────
 // ═══ BACKGROUND MUSIC + MUFFLE (Balatro-style) ═══
 let musicPlaying=false,musicNodes=[],musicGain=null,musicBPM=130,musicStep=0,musicInterval=null
 let musicMuffleFilter=null,musicMuffleGain=null,musicDistortion=null,isMuffled=false
 function _makeMuffleDistCurve(amt){const n=256,c=new Float32Array(n);for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=(Math.PI+amt)*x/(Math.PI+amt*Math.abs(x))}return c}
 function startMusic(){
-  if(musicPlaying||!actx)return;musicPlaying=true;musicStep=0
+  if(DISABLE_MUSIC||musicPlaying||!actx)return;musicPlaying=true;musicStep=0
   musicGain=actx.createGain();musicGain.gain.setValueAtTime(1.0,actx.currentTime)
   musicMuffleFilter=actx.createBiquadFilter();musicMuffleFilter.type='lowpass'
   musicMuffleFilter.frequency.setValueAtTime(20000,actx.currentTime);musicMuffleFilter.Q.setValueAtTime(0.7,actx.currentTime)

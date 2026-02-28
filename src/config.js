@@ -10,6 +10,9 @@ const MAX_LIVES = 3, DROP_CHANCE = 0.65, GLASS_CHANCE = 0.12
 const CHARGE_DUR = 90
 const FIELD_MARGIN = 0.8
 
+const DISABLE_SFX   = false
+const DISABLE_MUSIC = true
+
 // Mobile detection & perf tuning
 const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && innerWidth < 900)
 const MAX_PARTICLES_CAP = 600
