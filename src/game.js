@@ -67,14 +67,14 @@ function applyDrop(t) {
     case 'slowmo':
       if (timeScaleTimer > 0)
         deactivateDropLog(timeScale < 1 ? 'slowmo' : 'fastmo')
-      timeScale = 0.7
-      timeScaleTimer = 5 * 60
+      timeScale = 0.8
+      timeScaleTimer = 3 * 60
       timeAccum = 0
       break
     case 'fastmo':
       if (timeScaleTimer > 0)
         deactivateDropLog(timeScale < 1 ? 'slowmo' : 'fastmo')
-      timeScale = 1.3
+      timeScale = 1.2
       timeScaleTimer = 3 * 60
       timeAccum = 0
       break
@@ -450,7 +450,7 @@ function update() {
       targetPaddleY = PADDLE_Y
       deactivateDropLog('paddle_down')
       showDropExpiry('↓ PADDLE BAIXO', 0x44ddaa)
-      spawnP(paddleX, currentPaddleY, 0x44ddaa, 25)
+      spawnP(paddleX, currentPaddleY, 0x44ddaa, PADDLE_EXPIRY_COUNT)
     }
   }
   if (paddleUpTimer > 0) {
@@ -461,7 +461,7 @@ function update() {
       targetPaddleY = PADDLE_Y
       deactivateDropLog('paddle_up')
       showDropExpiry('↑ PADDLE ALTO', 0xdd4444)
-      spawnP(paddleX, currentPaddleY, 0xdd4444, 25)
+      spawnP(paddleX, currentPaddleY, 0xdd4444, PADDLE_EXPIRY_COUNT)
     }
   }
   if (laserSightTimer > 0) {

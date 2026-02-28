@@ -31,21 +31,21 @@ function rebuildPaddle(w) {
 }
 
 function spawnPaddleThruster(color, dir) {
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < PADDLE_THRUSTER_COUNT; i++) {
     const ox = (Math.random() - 0.5) * paddleW * 0.8
     const spawnY = currentPaddleY + dir * PADDLE_H / 2
     const vx = (Math.random() - 0.5) * 0.03
     const vy = dir * (0.04 + Math.random() * 0.08)
-    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, 0.5 + Math.random() * 0.8, 0.04 + Math.random() * 0.03)
+    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, (0.5 + Math.random() * 0.8) * PADDLE_SIZE_SCALE, 0.04 + Math.random() * 0.03)
   }
 }
 
 function spawnPaddleThrusterBurst(color, dir) {
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < PADDLE_BURST_COUNT; i++) {
     const ox = (Math.random() - 0.5) * paddleW
     const spawnY = currentPaddleY + dir * PADDLE_H / 2
     const vx = (Math.random() - 0.5) * 0.06
     const vy = dir * (0.06 + Math.random() * 0.14)
-    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, 0.8 + Math.random() * 1.5, 0.02 + Math.random() * 0.03)
+    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, (0.8 + Math.random() * 1.5) * PADDLE_SIZE_SCALE, 0.02 + Math.random() * 0.03)
   }
 }

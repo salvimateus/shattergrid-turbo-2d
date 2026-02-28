@@ -15,8 +15,13 @@ const DISABLE_MUSIC = false
 
 // Mobile detection & perf tuning
 const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && innerWidth < 900)
-const MAX_PARTICLES_CAP = 600
-const TRAIL_INTERVAL = 2
-const CHARGE_PARTICLE_INTERVAL = 3
-const BOMB_TRAIL_INTERVAL = 3
+const MAX_PARTICLES_CAP = IS_MOBILE ? 120 : 600
+const TRAIL_INTERVAL = IS_MOBILE ? 6 : 2
+const CHARGE_PARTICLE_INTERVAL = IS_MOBILE ? 6 : 3
+const BOMB_TRAIL_INTERVAL = IS_MOBILE ? 6 : 3
 const STEPS_PER_FRAME = 1
+// Paddle thruster particles (paddle_up / paddle_down drop)
+const PADDLE_THRUSTER_COUNT = 1
+const PADDLE_BURST_COUNT    = 5
+const PADDLE_SIZE_SCALE     = 0.45
+const PADDLE_EXPIRY_COUNT   = 8

@@ -127,11 +127,16 @@ const DISABLE_MUSIC = false
 
 // Mobile detection & perf tuning
 const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && innerWidth < 900)
-const MAX_PARTICLES_CAP = 600
-const TRAIL_INTERVAL = 2
-const CHARGE_PARTICLE_INTERVAL = 3
-const BOMB_TRAIL_INTERVAL = 3
+const MAX_PARTICLES_CAP = IS_MOBILE ? 120 : 600
+const TRAIL_INTERVAL = IS_MOBILE ? 6 : 2
+const CHARGE_PARTICLE_INTERVAL = IS_MOBILE ? 6 : 3
+const BOMB_TRAIL_INTERVAL = IS_MOBILE ? 6 : 3
 const STEPS_PER_FRAME = 1
+// Paddle thruster particles (paddle_up / paddle_down drop)
+const PADDLE_THRUSTER_COUNT = 1
+const PADDLE_BURST_COUNT    = 5
+const PADDLE_SIZE_SCALE     = 0.45
+const PADDLE_EXPIRY_COUNT   = 8
 
 
 // ──── state.js ────
@@ -526,22 +531,22 @@ function rebuildPaddle(w) {
 }
 
 function spawnPaddleThruster(color, dir) {
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < PADDLE_THRUSTER_COUNT; i++) {
     const ox = (Math.random() - 0.5) * paddleW * 0.8
     const spawnY = currentPaddleY + dir * PADDLE_H / 2
     const vx = (Math.random() - 0.5) * 0.03
     const vy = dir * (0.04 + Math.random() * 0.08)
-    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, 0.5 + Math.random() * 0.8, 0.04 + Math.random() * 0.03)
+    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, (0.5 + Math.random() * 0.8) * PADDLE_SIZE_SCALE, 0.04 + Math.random() * 0.03)
   }
 }
 
 function spawnPaddleThrusterBurst(color, dir) {
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < PADDLE_BURST_COUNT; i++) {
     const ox = (Math.random() - 0.5) * paddleW
     const spawnY = currentPaddleY + dir * PADDLE_H / 2
     const vx = (Math.random() - 0.5) * 0.06
     const vy = dir * (0.06 + Math.random() * 0.14)
-    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, 0.8 + Math.random() * 1.5, 0.02 + Math.random() * 0.03)
+    _spawnRawParticle(paddleX + ox, spawnY, vx, vy, color, (0.8 + Math.random() * 1.5) * PADDLE_SIZE_SCALE, 0.02 + Math.random() * 0.03)
   }
 }
 
@@ -1189,14 +1194,14 @@ function applyDrop(t) {
     case 'slowmo':
       if (timeScaleTimer > 0)
         deactivateDropLog(timeScale < 1 ? 'slowmo' : 'fastmo')
-      timeScale = 0.7
-      timeScaleTimer = 5 * 60
+      timeScale = 0.8
+      timeScaleTimer = 3 * 60
       timeAccum = 0
       break
     case 'fastmo':
       if (timeScaleTimer > 0)
         deactivateDropLog(timeScale < 1 ? 'slowmo' : 'fastmo')
-      timeScale = 1.3
+      timeScale = 1.2
       timeScaleTimer = 3 * 60
       timeAccum = 0
       break
@@ -1572,7 +1577,7 @@ function update() {
       targetPaddleY = PADDLE_Y
       deactivateDropLog('paddle_down')
       showDropExpiry('↓ PADDLE BAIXO', 0x44ddaa)
-      spawnP(paddleX, currentPaddleY, 0x44ddaa, 25)
+      spawnP(paddleX, currentPaddleY, 0x44ddaa, PADDLE_EXPIRY_COUNT)
     }
   }
   if (paddleUpTimer > 0) {
@@ -1583,7 +1588,7 @@ function update() {
       targetPaddleY = PADDLE_Y
       deactivateDropLog('paddle_up')
       showDropExpiry('↑ PADDLE ALTO', 0xdd4444)
-      spawnP(paddleX, currentPaddleY, 0xdd4444, 25)
+      spawnP(paddleX, currentPaddleY, 0xdd4444, PADDLE_EXPIRY_COUNT)
     }
   }
   if (laserSightTimer > 0) {
