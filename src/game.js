@@ -79,6 +79,7 @@ function applyDrop(t) {
       timeAccum = 0
       break
     case 'paddle_down': {
+      if (paddleUpTimer > 0) { paddleUpTimer = 0; deactivateDropLog('paddle_up') }
       const MIN_Y = -FIELD_H / 2 + 1.5
       paddleYOffset = Math.max(-1.5, MIN_Y - PADDLE_Y)
       targetPaddleY = PADDLE_Y + paddleYOffset
@@ -87,6 +88,7 @@ function applyDrop(t) {
       break
     }
     case 'paddle_up': {
+      if (paddleDownTimer > 0) { paddleDownTimer = 0; deactivateDropLog('paddle_down') }
       const MAX_Y = -FIELD_H / 2 + 6.0
       paddleYOffset = Math.min(1.5, MAX_Y - PADDLE_Y)
       targetPaddleY = PADDLE_Y + paddleYOffset
