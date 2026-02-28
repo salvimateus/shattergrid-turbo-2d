@@ -65,26 +65,55 @@ function drawBackground() {
 // ─── Walls ───
 function drawWalls() {
   const wt = 0.15
+  // Deslocamento visual das paredes quando paddle as pressiona (max 0.18 unidades)
+  const nudgeOffL = wallNudgeLeft  * 0.18
+  const nudgeOffR = wallNudgeRight * 0.18
+
   ctx.save()
-  ctx.fillStyle = '#0044aa'
   ctx.globalAlpha = 0.4
-  ctx.shadowColor = '#0066ff'; ctx.shadowBlur = ws(0.6)
-  // Left wall
-  ctx.fillRect(wx(-FIELD_W / 2 - wt), wy(FIELD_H / 2 + wt), ws(wt), ws(FIELD_H + wt * 2 + 1))
-  // Right wall
-  ctx.fillRect(wx(FIELD_W / 2), wy(FIELD_H / 2 + wt), ws(wt), ws(FIELD_H + wt * 2 + 1))
+  ctx.shadowBlur = ws(0.6)
+
+  // Left wall — desloca para a esquerda quando pressionada
+  ctx.fillStyle = wallNudgeLeft  > 0.05 ? `hsl(${200 + wallNudgeLeft  * 40},100%,${50 + wallNudgeLeft  * 30}%)` : '#0044aa'
+  ctx.shadowColor = wallNudgeLeft  > 0.05 ? '#00ffff' : '#0066ff'
+  ctx.fillRect(wx(-FIELD_W / 2 - wt - nudgeOffL), wy(FIELD_H / 2 + wt), ws(wt), ws(FIELD_H + wt * 2 + 1))
+
+  // Right wall — desloca para a direita quando pressionada
+  ctx.fillStyle = wallNudgeRight > 0.05 ? `hsl(${200 + wallNudgeRight * 40},100%,${50 + wallNudgeRight * 30}%)` : '#0044aa'
+  ctx.shadowColor = wallNudgeRight > 0.05 ? '#00ffff' : '#0066ff'
+  ctx.fillRect(wx(FIELD_W / 2 + nudgeOffR), wy(FIELD_H / 2 + wt), ws(wt), ws(FIELD_H + wt * 2 + 1))
+
   // Top wall
+  ctx.fillStyle = '#0044aa'; ctx.shadowColor = '#0066ff'
   ctx.fillRect(wx(-FIELD_W / 2 - wt), wy(FIELD_H / 2 + wt), ws(FIELD_W + wt * 2), ws(wt))
   ctx.restore()
+
   // Neon inner edge glow
   ctx.save()
-  ctx.strokeStyle = '#0088ff'; ctx.globalAlpha = 0.6; ctx.lineWidth = 1.5
-  ctx.shadowColor = '#0088ff'; ctx.shadowBlur = 12
+  ctx.lineWidth = 1.5
+  // Left edge
+  ctx.strokeStyle = wallNudgeLeft  > 0.05 ? `hsl(${180 + wallNudgeLeft  * 60},100%,70%)` : '#0088ff'
+  ctx.globalAlpha = 0.6 + wallNudgeLeft  * 0.35
+  ctx.shadowColor = ctx.strokeStyle
+  ctx.shadowBlur = 12 + wallNudgeLeft  * 24
   ctx.beginPath()
-  ctx.moveTo(wx(-FIELD_W / 2), wy(-FIELD_H / 2))
-  ctx.lineTo(wx(-FIELD_W / 2), wy(FIELD_H / 2))
+  ctx.moveTo(wx(-FIELD_W / 2 - nudgeOffL), wy(-FIELD_H / 2))
+  ctx.lineTo(wx(-FIELD_W / 2 - nudgeOffL), wy(FIELD_H / 2))
+  ctx.stroke()
+  // Right edge
+  ctx.strokeStyle = wallNudgeRight > 0.05 ? `hsl(${180 + wallNudgeRight * 60},100%,70%)` : '#0088ff'
+  ctx.globalAlpha = 0.6 + wallNudgeRight * 0.35
+  ctx.shadowColor = ctx.strokeStyle
+  ctx.shadowBlur = 12 + wallNudgeRight * 24
+  ctx.beginPath()
+  ctx.moveTo(wx(FIELD_W / 2 + nudgeOffR), wy(-FIELD_H / 2))
+  ctx.lineTo(wx(FIELD_W / 2 + nudgeOffR), wy(FIELD_H / 2))
+  ctx.stroke()
+  // Top edge
+  ctx.strokeStyle = '#0088ff'; ctx.globalAlpha = 0.6; ctx.shadowColor = '#0088ff'; ctx.shadowBlur = 12
+  ctx.beginPath()
+  ctx.moveTo(wx(-FIELD_W / 2), wy(FIELD_H / 2))
   ctx.lineTo(wx(FIELD_W / 2), wy(FIELD_H / 2))
-  ctx.lineTo(wx(FIELD_W / 2), wy(-FIELD_H / 2))
   ctx.stroke()
   ctx.restore()
 }

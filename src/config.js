@@ -11,7 +11,7 @@ const CHARGE_DUR = 90
 const FIELD_MARGIN = 0.8
 
 const DISABLE_SFX   = false
-const DISABLE_MUSIC = true
+const DISABLE_MUSIC = false
 
 // Mobile detection & perf tuning
 const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && innerWidth < 900)

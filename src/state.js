@@ -19,4 +19,5 @@ let bricks = [], particles = [], trails = [], drops = [], balls = [], bombs = []
 let charging = false, chTimer = 0, chParts = []
 let laserSightTimer = 0
 let spinTimer = 0, ghostTimer = 0
-
+// Pressão do paddle contra as paredes laterais (0..1)
+let wallNudgeLeft = 0, wallNudgeRight = 0

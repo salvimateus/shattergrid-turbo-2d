@@ -198,6 +198,8 @@ function initGame() {
   laserSightTimer = 0
   spinTimer = 0
   ghostTimer = 0
+  wallNudgeLeft = 0
+  wallNudgeRight = 0
   canvas.style.filter = ''
   document.getElementById('crt-overlay').style.display = 'none'
   stopFilmNoise()
@@ -485,6 +487,12 @@ function update() {
   const paddleVel = paddleX - prevPX
   paddleTilt = spinTimer > 0 ? paddleTilt + 0.18 : paddleVel * 0.45
 
+  // Nudge das paredes: acumula quando paddle pressiona o limite, decai quando não
+  if (mouseX < minX) wallNudgeLeft  = Math.min(1, wallNudgeLeft  + 0.12)
+  else                wallNudgeLeft  = Math.max(0, wallNudgeLeft  - 0.06)
+  if (mouseX > maxX) wallNudgeRight = Math.min(1, wallNudgeRight + 0.12)
+  else                wallNudgeRight = Math.max(0, wallNudgeRight - 0.06)
+
   if (charging) {
     updateCharge()
     updateDrops()
@@ -509,15 +517,25 @@ function update() {
     if (b.x - BALL_R < -FIELD_W / 2) {
       b.x = -FIELD_W / 2 + BALL_R
       b.vx = Math.abs(b.vx)
-      shake(0.2)
-      spawnP(b.x, b.y, 0x0088ff, 6)
+      // Mecânica de parede pressionada: boost vertical proporcional ao nudge
+      if (wallNudgeLeft > 0.05) {
+        b.vy += wallNudgeLeft * 0.045
+        b.vy = Math.min(b.vy, b.speed * 0.95)
+      }
+      shake(0.2 + wallNudgeLeft * 0.3)
+      spawnP(b.x, b.y, wallNudgeLeft > 0.05 ? 0x00ffff : 0x0088ff, wallNudgeLeft > 0.05 ? 10 : 6)
       SFX.wallHit()
     }
     if (b.x + BALL_R > FIELD_W / 2) {
       b.x = FIELD_W / 2 - BALL_R
       b.vx = -Math.abs(b.vx)
-      shake(0.2)
-      spawnP(b.x, b.y, 0x0088ff, 6)
+      // Mecânica de parede pressionada: boost vertical proporcional ao nudge
+      if (wallNudgeRight > 0.05) {
+        b.vy += wallNudgeRight * 0.045
+        b.vy = Math.min(b.vy, b.speed * 0.95)
+      }
+      shake(0.2 + wallNudgeRight * 0.3)
+      spawnP(b.x, b.y, wallNudgeRight > 0.05 ? 0x00ffff : 0x0088ff, wallNudgeRight > 0.05 ? 10 : 6)
       SFX.wallHit()
     }
     if (b.y + BALL_R > FIELD_H / 2) {
@@ -534,24 +552,36 @@ function update() {
       balls.splice(bi, 1)
       continue
     }
-    // Paddle collision
-    const bx = b.x,
-      by = b.y
+    // Paddle collision — OBB: transforma a bola para o espaço local do paddle
+    const bx = b.x, by = b.y
+    const cosT = Math.cos(paddleTilt), sinT = Math.sin(paddleTilt)
+    const dx = bx - paddleX, dy = by - currentPaddleY
+    // Posição da bola no referencial local do paddle (rotação inversa)
+    const lx = dx * cosT + dy * sinT
+    const ly = -dx * sinT + dy * cosT
+    // Velocidade da bola no referencial local (só componente Y é necessária para checar direção)
+    const lvy = -b.vx * sinT + b.vy * cosT
     if (
-      by - BALL_R < currentPaddleY + PADDLE_H / 2 &&
-      by + BALL_R > currentPaddleY - PADDLE_H / 2 &&
-      bx > paddleX - hw - BALL_R &&
-      bx < paddleX + hw + BALL_R &&
-      b.vy < 0
+      Math.abs(lx) < hw + BALL_R &&
+      Math.abs(ly) < PADDLE_H / 2 + BALL_R &&
+      lvy < 0
     ) {
-      const hp = Math.max(-0.95, Math.min(0.95, (bx - paddleX) / hw))
-      const tilt = paddleTilt * 2.5,
-        ang = Math.PI / 2 + hp * (Math.PI / 3) + tilt
+      const hp = Math.max(-0.95, Math.min(0.95, lx / hw))
+      // Ângulo de saída no espaço local do paddle
+      const ang = Math.PI / 2 + hp * (Math.PI / 3)
       b.speed = Math.min(b.speed + 0.003, BALL_SPEED_MAX)
-      b.vx = Math.cos(ang) * b.speed
-      b.vy = Math.sin(ang) * b.speed
+      let nlvx = Math.cos(ang) * b.speed
+      let nlvy = Math.sin(ang) * b.speed
+      if (nlvy < 0.04) nlvy = 0.04
+      // Converter de volta para espaço do mundo
+      b.vx = nlvx * cosT - nlvy * sinT
+      b.vy = nlvx * sinT + nlvy * cosT
+      // Reposicionar a bola sobre a superfície do paddle (no espaço local)
+      const newLy = PADDLE_H / 2 + BALL_R
+      b.x = paddleX + lx * cosT - newLy * sinT
+      b.y = currentPaddleY + lx * sinT + newLy * cosT
+      // Garantir que a bola sobe no espaço do mundo (nunca fica presa)
       if (b.vy < 0.04) b.vy = 0.04
-      b.y = currentPaddleY + PADDLE_H / 2 + BALL_R
       shake(0.15)
       spawnP(bx, currentPaddleY + PADDLE_H / 2, 0x00ffff, 8)
       SFX.paddleHit()

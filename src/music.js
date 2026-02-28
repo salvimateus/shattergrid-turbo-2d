@@ -3,7 +3,7 @@ let musicPlaying=false,musicNodes=[],musicGain=null,musicBPM=130,musicStep=0,mus
 let musicMuffleFilter=null,musicMuffleGain=null,musicDistortion=null,isMuffled=false
 function _makeMuffleDistCurve(amt){const n=256,c=new Float32Array(n);for(let i=0;i<n;i++){const x=i*2/n-1;c[i]=(Math.PI+amt)*x/(Math.PI+amt*Math.abs(x))}return c}
 function startMusic(){
-  if(DISABLE_MUSIC||musicPlaying||!actx)return;musicPlaying=true;musicStep=0
+  if(DISABLE_MUSIC||IS_MOBILE||musicPlaying||!actx)return;musicPlaying=true;musicStep=0
   musicGain=actx.createGain();musicGain.gain.setValueAtTime(1.0,actx.currentTime)
   musicMuffleFilter=actx.createBiquadFilter();musicMuffleFilter.type='lowpass'
   musicMuffleFilter.frequency.setValueAtTime(20000,actx.currentTime);musicMuffleFilter.Q.setValueAtTime(0.7,actx.currentTime)

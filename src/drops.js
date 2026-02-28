@@ -20,10 +20,15 @@ const DROP_TYPES_ALL = [
 const DROP_VISUAL_COLORS = [0xff00ff, 0x00ffff, 0xffff00, 0xff4444, 0x44ff44, 0x4488ff, 0xff8800, 0xaa44ff, 0xff66cc, 0x66ffcc]
 const MAX_DROPS = 3
 
+const MOBILE_BLOCKED_DROPS = ['slowmo', 'fastmo', 'bw']
+
 function spawnDrop(x, y) {
   if (drops.length >= MAX_DROPS) return
   if (Math.random() > DROP_CHANCE) return
-  const t = DROP_TYPES_ALL[Math.floor(Math.random() * DROP_TYPES_ALL.length)]
+  const pool = IS_MOBILE
+    ? DROP_TYPES_ALL.filter(t => !MOBILE_BLOCKED_DROPS.includes(t.id))
+    : DROP_TYPES_ALL
+  const t = pool[Math.floor(Math.random() * pool.length)]
   const vc = DROP_VISUAL_COLORS[Math.floor(Math.random() * DROP_VISUAL_COLORS.length)]
   drops.push({ x, y, type: t, visualColor: vc, vy: -0.06, angle: 0 })
 }
