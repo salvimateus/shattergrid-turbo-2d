@@ -16,7 +16,6 @@ function _spawnRawParticle(x, y, vx, vy, color, size, decay) {
 }
 
 function spawnP(x, y, color, n = 20) {
-  n = IS_MOBILE ? Math.ceil(n * PARTICLE_SCALE) : n
   for (let i = 0; i < n; i++) {
     const a = Math.random() * Math.PI * 2
     const sp = 0.05 + Math.random() * 0.18
@@ -48,10 +47,9 @@ function drawP() {
 
 // ═══ TRAILS ═══
 const trailPool = []
-const MAX_TRAILS = IS_MOBILE ? 30 : 80
+const MAX_TRAILS = 80
 
 function spawnTrail(x, y) {
-  if (IS_MOBILE) return
   let t
   if (trailPool.length > 0) {
     t = trailPool.pop(); t.x = x; t.y = y; t.life = 1; t.decay = 0.06
@@ -80,7 +78,7 @@ function drawTrails() {
 }
 
 // ═══ SCREEN SHAKE ═══
-function shake(a) { shakeAmt = Math.max(shakeAmt, IS_MOBILE ? a * 0.5 : a) }
+function shake(a) { shakeAmt = Math.max(shakeAmt, a) }
 
 function updateShake() {
   if (shakeAmt > 0.01) {
@@ -89,4 +87,3 @@ function updateShake() {
     shakeAmt *= 0.88
   } else { shakeAmt = 0; shakeX = 0; shakeY = 0 }
 }
-

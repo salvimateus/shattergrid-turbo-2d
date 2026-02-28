@@ -13,13 +13,13 @@ function drawBomb(b) {
   ctx.rotate(b.rot)
   // Outer glow
   ctx.globalAlpha = 0.15 + Math.sin(frame * 0.3) * 0.08
-  if (!IS_MOBILE) { ctx.shadowColor = '#ff6600'; ctx.shadowBlur = ws(BOMB_R * 5) }
+  ctx.shadowColor = '#ff6600'; ctx.shadowBlur = ws(BOMB_R * 5)
   ctx.fillStyle = '#ff6600'
   ctx.beginPath(); ctx.arc(0, 0, ws(BOMB_R * 3), 0, Math.PI * 2); ctx.fill()
   // Core
   ctx.globalAlpha = 1
   ctx.fillStyle = '#ff6600'
-  if (!IS_MOBILE) { ctx.shadowColor = '#ff4400'; ctx.shadowBlur = ws(BOMB_R * 3) }
+  ctx.shadowColor = '#ff4400'; ctx.shadowBlur = ws(BOMB_R * 3)
   ctx.beginPath(); ctx.arc(0, 0, ws(BOMB_R), 0, Math.PI * 2); ctx.fill()
   // Hot center
   ctx.fillStyle = '#ffcc44'
@@ -52,7 +52,7 @@ function updateBombs() {
   for (let i = bombs.length - 1; i >= 0; i--) {
     const b = bombs[i]; b.age++
     b.x += b.vx; b.y += b.vy; b.vy -= 0.0008; b.rot += 0.1
-    if (frame % BOMB_TRAIL_INTERVAL === 0) spawnP(b.x, b.y, 0xff8800, IS_MOBILE ? 1 : 3)
+    if (frame % BOMB_TRAIL_INTERVAL === 0) spawnP(b.x, b.y, 0xff8800, 3)
     // Wall bounces
     if (b.x - BOMB_R < -FIELD_W / 2) { b.x = -FIELD_W / 2 + BOMB_R; b.vx = Math.abs(b.vx); SFX.bombBounce() }
     if (b.x + BOMB_R > FIELD_W / 2)  { b.x = FIELD_W / 2 - BOMB_R;  b.vx = -Math.abs(b.vx); SFX.bombBounce() }
@@ -77,4 +77,3 @@ function updateBombs() {
     if (hit) { explodeBomb(b); bombs.splice(i, 1) }
   }
 }
-

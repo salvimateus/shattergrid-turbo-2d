@@ -47,7 +47,7 @@ function drawBackground() {
   // Grid (subtle wireframe like original)
   ctx.save()
   ctx.strokeStyle = IS_MOBILE ? '#1155cc' : '#1a1a4e'
-  ctx.globalAlpha = IS_MOBILE ? 0.10 : 0.18
+  ctx.globalAlpha = 0.18
   ctx.lineWidth = 0.5
   ctx.translate(cxOff, cyOff)
   ctx.rotate(Math.sin(frame * 0.001) * 0.02)
@@ -68,7 +68,7 @@ function drawWalls() {
   ctx.save()
   ctx.fillStyle = '#0044aa'
   ctx.globalAlpha = 0.4
-  if (!IS_MOBILE) { ctx.shadowColor = '#0066ff'; ctx.shadowBlur = ws(0.6) }
+  ctx.shadowColor = '#0066ff'; ctx.shadowBlur = ws(0.6)
   // Left wall
   ctx.fillRect(wx(-FIELD_W / 2 - wt), wy(FIELD_H / 2 + wt), ws(wt), ws(FIELD_H + wt * 2 + 1))
   // Right wall
@@ -76,19 +76,17 @@ function drawWalls() {
   // Top wall
   ctx.fillRect(wx(-FIELD_W / 2 - wt), wy(FIELD_H / 2 + wt), ws(FIELD_W + wt * 2), ws(wt))
   ctx.restore()
-  if (!IS_MOBILE) {
-    // Neon inner edge glow
-    ctx.save()
-    ctx.strokeStyle = '#0088ff'; ctx.globalAlpha = 0.6; ctx.lineWidth = 1.5
-    ctx.shadowColor = '#0088ff'; ctx.shadowBlur = 12
-    ctx.beginPath()
-    ctx.moveTo(wx(-FIELD_W / 2), wy(-FIELD_H / 2))
-    ctx.lineTo(wx(-FIELD_W / 2), wy(FIELD_H / 2))
-    ctx.lineTo(wx(FIELD_W / 2), wy(FIELD_H / 2))
-    ctx.lineTo(wx(FIELD_W / 2), wy(-FIELD_H / 2))
-    ctx.stroke()
-    ctx.restore()
-  }
+  // Neon inner edge glow
+  ctx.save()
+  ctx.strokeStyle = '#0088ff'; ctx.globalAlpha = 0.6; ctx.lineWidth = 1.5
+  ctx.shadowColor = '#0088ff'; ctx.shadowBlur = 12
+  ctx.beginPath()
+  ctx.moveTo(wx(-FIELD_W / 2), wy(-FIELD_H / 2))
+  ctx.lineTo(wx(-FIELD_W / 2), wy(FIELD_H / 2))
+  ctx.lineTo(wx(FIELD_W / 2), wy(FIELD_H / 2))
+  ctx.lineTo(wx(FIELD_W / 2), wy(-FIELD_H / 2))
+  ctx.stroke()
+  ctx.restore()
 }
 
 // ─── Neon color helper ───
@@ -96,4 +94,3 @@ function hexToStr(h) { return '#' + h.toString(16).padStart(6, '0') }
 
 // ─── Screen → Field X ───
 function screenToFieldX(screenX) { return (screenX - cxOff) / scale }
-

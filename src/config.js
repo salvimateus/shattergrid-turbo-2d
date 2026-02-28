@@ -12,10 +12,8 @@ const FIELD_MARGIN = 0.8
 
 // Mobile detection & perf tuning
 const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && innerWidth < 900)
-const MAX_PARTICLES_CAP = IS_MOBILE ? 120 : 600
-const TRAIL_INTERVAL = IS_MOBILE ? 6 : 2
-const PARTICLE_SCALE = IS_MOBILE ? 0.35 : 1.0
-const CHARGE_PARTICLE_INTERVAL = IS_MOBILE ? 6 : 3
-const BOMB_TRAIL_INTERVAL = IS_MOBILE ? 6 : 3
-// Steps de física por frame: compensa 30fps mobile vs 60fps desktop (mantém velocidade igual)
-const STEPS_PER_FRAME = IS_MOBILE ? 2 : 1
+const MAX_PARTICLES_CAP = 600
+const TRAIL_INTERVAL = 2
+const CHARGE_PARTICLE_INTERVAL = 3
+const BOMB_TRAIL_INTERVAL = 3
+const STEPS_PER_FRAME = 1

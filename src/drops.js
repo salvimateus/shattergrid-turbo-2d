@@ -17,15 +17,13 @@ const DROP_TYPES_ALL = [
   { id: 'spin',        label: '🌀 GIRO LOUCO',     color: 0xff44ff, good: false },
   { id: 'ghost',       label: '👻 FANTASMA',       color: 0x6644aa, good: false },
 ]
-const MOBILE_EXCLUDED = new Set(['bw'])
-const DROP_TYPES = IS_MOBILE ? DROP_TYPES_ALL.filter(t => !MOBILE_EXCLUDED.has(t.id)) : DROP_TYPES_ALL
 const DROP_VISUAL_COLORS = [0xff00ff, 0x00ffff, 0xffff00, 0xff4444, 0x44ff44, 0x4488ff, 0xff8800, 0xaa44ff, 0xff66cc, 0x66ffcc]
 const MAX_DROPS = 3
 
 function spawnDrop(x, y) {
   if (drops.length >= MAX_DROPS) return
   if (Math.random() > DROP_CHANCE) return
-  const t = DROP_TYPES[Math.floor(Math.random() * DROP_TYPES.length)]
+  const t = DROP_TYPES_ALL[Math.floor(Math.random() * DROP_TYPES_ALL.length)]
   const vc = DROP_VISUAL_COLORS[Math.floor(Math.random() * DROP_VISUAL_COLORS.length)]
   drops.push({ x, y, type: t, visualColor: vc, vy: -0.06, angle: 0 })
 }
@@ -34,14 +32,10 @@ function drawDrop(d) {
   const ps = ws(0.55)
   ctx.save()
   ctx.translate(wx(d.x), wy(d.y))
-  if (IS_MOBILE) {
-    const s = 1 + 0.18 * Math.sin(frame * 0.14); ctx.scale(s, s)
-  } else {
-    d.angle += 0.05; ctx.rotate(d.angle)
-  }
+  d.angle += 0.05; ctx.rotate(d.angle)
   const col = hexToStr(d.visualColor)
   ctx.globalAlpha = 0.9
-  if (!IS_MOBILE) { ctx.shadowColor = col; ctx.shadowBlur = ws(0.5) }
+  ctx.shadowColor = col; ctx.shadowBlur = ws(0.5)
   ctx.fillStyle = col
   ctx.fillRect(-ps / 2, -ps / 2, ps, ps)
   ctx.restore()
@@ -65,7 +59,6 @@ function updateDrops() {
 // ─── Film Noise (desktop) ───
 let filmNoiseRAF = null
 function startFilmNoise() {
-  if (IS_MOBILE) return
   const c = document.getElementById('film-noise')
   c.width = Math.floor(innerWidth / 4); c.height = Math.floor(innerHeight / 4)
   const fctx = c.getContext('2d')

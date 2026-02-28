@@ -20,7 +20,7 @@ function createBricks() {
 }
 
 function drawBrick(br) {
-  const floatY = IS_MOBILE ? br.y : br.y + Math.sin(frame * 0.02 + br.x * 0.5) * 0.02
+  const floatY = br.y + Math.sin(frame * 0.02 + br.x * 0.5) * 0.02
   const pw = ws(BRICK_W), ph = ws(BRICK_H)
   const bx = wx(br.x) - pw / 2, by = wy(floatY) - ph / 2
   const r = Math.min(3, pw / 5, ph / 5)
@@ -28,18 +28,16 @@ function drawBrick(br) {
 
   ctx.save()
   if (br.glass) {
-    const glassOpa = IS_MOBILE ? 0.35 : 0.25 + Math.sin(frame * 0.04 + br.x) * 0.1
+    const glassOpa = 0.25 + Math.sin(frame * 0.04 + br.x) * 0.1
     ctx.globalAlpha = glassOpa
     ctx.fillStyle = '#aaeeff'
-    if (!IS_MOBILE) { ctx.shadowColor = '#88ccff'; ctx.shadowBlur = ws(0.4) }
+    ctx.shadowColor = '#88ccff'; ctx.shadowBlur = ws(0.4)
   } else {
     const hpRatio = br.hp / br.maxHp
     ctx.globalAlpha = 0.4 + hpRatio * 0.6
     ctx.fillStyle = col
-    if (!IS_MOBILE) {
-      const ei = br.hitAnim > 0 ? 2.5 : (0.5 + br.row * 0.12)
-      ctx.shadowColor = col; ctx.shadowBlur = ws(0.25 + ei * 0.12)
-    }
+    const ei = br.hitAnim > 0 ? 2.5 : (0.5 + br.row * 0.12)
+    ctx.shadowColor = col; ctx.shadowBlur = ws(0.25 + ei * 0.12)
   }
   ctx.beginPath(); ctx.roundRect(bx, by, pw, ph, r); ctx.fill()
 
@@ -74,4 +72,3 @@ function checkMusicIntensity() {
     if (musicPlaying) { stopMusic(); startMusic() }
   }
 }
-
