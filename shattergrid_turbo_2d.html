@@ -127,7 +127,8 @@ const TRAIL_INTERVAL = IS_MOBILE ? 6 : 2
 const PARTICLE_SCALE = IS_MOBILE ? 0.35 : 1.0
 const CHARGE_PARTICLE_INTERVAL = IS_MOBILE ? 6 : 3
 const BOMB_TRAIL_INTERVAL = IS_MOBILE ? 6 : 3
-
+// Steps de física por frame: compensa 30fps mobile vs 60fps desktop (mantém velocidade igual)
+const STEPS_PER_FRAME = IS_MOBILE ? 2 : 1
 
 
 // ──── state.js ────
@@ -719,7 +720,7 @@ const DROP_TYPES_ALL = [
   { id: 'spin',        label: '🌀 GIRO LOUCO',     color: 0xff44ff, good: false },
   { id: 'ghost',       label: '👻 FANTASMA',       color: 0x6644aa, good: false },
 ]
-const MOBILE_EXCLUDED = new Set(['bw', 'crt', 'old_film'])
+const MOBILE_EXCLUDED = new Set(['bw'])
 const DROP_TYPES = IS_MOBILE ? DROP_TYPES_ALL.filter(t => !MOBILE_EXCLUDED.has(t.id)) : DROP_TYPES_ALL
 const DROP_VISUAL_COLORS = [0xff00ff, 0x00ffff, 0xffff00, 0xff4444, 0x44ff44, 0x4488ff, 0xff8800, 0xaa44ff, 0xff66cc, 0x66ffcc]
 const MAX_DROPS = 3
@@ -814,7 +815,6 @@ function clearAllFilters() {
   if (filmTimer > 0) { filmTimer = 0; stopFilmNoise(); deactivateDropLog('old_film') }
   canvas.style.filter = ''
 }
-
 
 
 // ──── bombs.js ────
@@ -1316,7 +1316,8 @@ function animate(now) {
   lastFrameTime = now
 
   if (timeScaleTimer > 0) {
-    timeScaleTimer--
+    // Decrementa proporcional aos steps para manter duração real igual entre mobile e desktop
+    timeScaleTimer -= STEPS_PER_FRAME
     if (timeScaleTimer <= 0) {
       const wasId = timeScale < 1 ? 'slowmo' : 'fastmo'
       const wasColor = timeScale < 1 ? 0x8844ff : 0xff2288
@@ -1327,7 +1328,8 @@ function animate(now) {
     }
   }
   if (timeScaleTimer <= 0 && timeScale !== 1) { timeScale = 1; timeAccum = 0 }
-  timeAccum += timeScale
+  // Multiplica por STEPS_PER_FRAME para rodar física na mesma velocidade que 60fps
+  timeAccum += timeScale * STEPS_PER_FRAME
   const steps = Math.floor(timeAccum); timeAccum -= steps
   for (let s = 0; s < steps; s++) update()
   updateP(); updateTrails(); updateShake()
@@ -1370,4 +1372,3 @@ animate()
 </script>
 </body>
 </html>
-

@@ -17,4 +17,5 @@ const TRAIL_INTERVAL = IS_MOBILE ? 6 : 2
 const PARTICLE_SCALE = IS_MOBILE ? 0.35 : 1.0
 const CHARGE_PARTICLE_INTERVAL = IS_MOBILE ? 6 : 3
 const BOMB_TRAIL_INTERVAL = IS_MOBILE ? 6 : 3
-
+// Steps de física por frame: compensa 30fps mobile vs 60fps desktop (mantém velocidade igual)
+const STEPS_PER_FRAME = IS_MOBILE ? 2 : 1

@@ -270,7 +270,8 @@ function animate(now) {
   lastFrameTime = now
 
   if (timeScaleTimer > 0) {
-    timeScaleTimer--
+    // Decrementa proporcional aos steps para manter duração real igual entre mobile e desktop
+    timeScaleTimer -= STEPS_PER_FRAME
     if (timeScaleTimer <= 0) {
       const wasId = timeScale < 1 ? 'slowmo' : 'fastmo'
       const wasColor = timeScale < 1 ? 0x8844ff : 0xff2288
@@ -281,7 +282,8 @@ function animate(now) {
     }
   }
   if (timeScaleTimer <= 0 && timeScale !== 1) { timeScale = 1; timeAccum = 0 }
-  timeAccum += timeScale
+  // Multiplica por STEPS_PER_FRAME para rodar física na mesma velocidade que 60fps
+  timeAccum += timeScale * STEPS_PER_FRAME
   const steps = Math.floor(timeAccum); timeAccum -= steps
   for (let s = 0; s < steps; s++) update()
   updateP(); updateTrails(); updateShake()

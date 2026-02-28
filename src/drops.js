@@ -17,7 +17,7 @@ const DROP_TYPES_ALL = [
   { id: 'spin',        label: '🌀 GIRO LOUCO',     color: 0xff44ff, good: false },
   { id: 'ghost',       label: '👻 FANTASMA',       color: 0x6644aa, good: false },
 ]
-const MOBILE_EXCLUDED = new Set(['bw', 'crt', 'old_film'])
+const MOBILE_EXCLUDED = new Set(['bw'])
 const DROP_TYPES = IS_MOBILE ? DROP_TYPES_ALL.filter(t => !MOBILE_EXCLUDED.has(t.id)) : DROP_TYPES_ALL
 const DROP_VISUAL_COLORS = [0xff00ff, 0x00ffff, 0xffff00, 0xff4444, 0x44ff44, 0x4488ff, 0xff8800, 0xaa44ff, 0xff66cc, 0x66ffcc]
 const MAX_DROPS = 3
@@ -112,4 +112,3 @@ function clearAllFilters() {
   if (filmTimer > 0) { filmTimer = 0; stopFilmNoise(); deactivateDropLog('old_film') }
   canvas.style.filter = ''
 }
-
