@@ -65,55 +65,85 @@ function drawBackground() {
 // ─── Walls ───
 function drawWalls() {
   const wt = 0.15
-  // Deslocamento visual das paredes quando paddle as pressiona (max 0.18 unidades)
-  const nudgeOffL = wallNudgeLeft  * 0.18
-  const nudgeOffR = wallNudgeRight * 0.18
+  const halfH = FIELD_H / 2
 
+  // Offsets de chacoalho: ruído rápido que decai
+  const shkL = (Math.random() - 0.5) * wallShakeLeft  * 0.28
+  const shkR = (Math.random() - 0.5) * wallShakeRight * 0.28
+  const shkT = (Math.random() - 0.5) * wallShakeTop   * 0.22
+
+  // A parede inclina em torno do seu eixo central (pivot no centro da parede lateral)
+  // wallTiltLeft/Right: ângulo em radianos, positivo = topo entra no campo
+  const tL = wallTiltLeft, tR = wallTiltRight
+
+  // Calcula os 4 cantos da parede esquerda inclinada (em coords de campo)
+  // Centro da parede: (-FIELD_W/2, 0), altura FIELD_H + folga
+  const wallCX_L = -FIELD_W / 2 - wt / 2
+  const wallCX_R =  FIELD_W / 2 + wt / 2
+  const hH = halfH + wt
+
+  function drawTiltedWallFill(cx, tilt, shk, color, shadow) {
+    const cosT = Math.cos(tilt), sinT = Math.sin(tilt)
+    // 4 cantos da parede no espaço do campo, rotacionados em torno do centro
+    const corners = [
+      [-wt / 2, -hH], [wt / 2, -hH], [wt / 2, hH], [-wt / 2, hH]
+    ].map(([lx, ly]) => [
+      cx + lx * cosT - ly * sinT + shk,
+      ly * cosT + lx * sinT
+    ])
+    ctx.save()
+    ctx.globalAlpha = 0.4
+    ctx.shadowColor = shadow; ctx.shadowBlur = ws(0.6)
+    ctx.fillStyle = color
+    ctx.beginPath()
+    ctx.moveTo(wx(corners[0][0]), wy(corners[0][1]))
+    for (let i = 1; i < 4; i++) ctx.lineTo(wx(corners[i][0]), wy(corners[i][1]))
+    ctx.closePath(); ctx.fill()
+    ctx.restore()
+  }
+
+  function drawTiltedWallEdge(cx, tilt, shk, color, alpha, blur) {
+    const cosT = Math.cos(tilt), sinT = Math.sin(tilt)
+    // Borda interna da parede (x local = 0, de -hH a +hH)
+    const x0 = cx + 0 * cosT - (-hH) * sinT + shk, y0 = (-hH) * cosT + 0 * sinT
+    const x1 = cx + 0 * cosT - ( hH) * sinT + shk, y1 = ( hH) * cosT + 0 * sinT
+    ctx.save()
+    ctx.globalAlpha = alpha; ctx.strokeStyle = color; ctx.shadowColor = color
+    ctx.shadowBlur = blur; ctx.lineWidth = 1.5
+    ctx.beginPath(); ctx.moveTo(wx(x0), wy(y0)); ctx.lineTo(wx(x1), wy(y1)); ctx.stroke()
+    ctx.restore()
+  }
+
+  const colorL = wallNudgeLeft  > 0.05 ? `hsl(${200 + wallNudgeLeft  * 40},100%,${50 + wallNudgeLeft  * 30}%)` : '#0044aa'
+  const colorR = wallNudgeRight > 0.05 ? `hsl(${200 + wallNudgeRight * 40},100%,${50 + wallNudgeRight * 30}%)` : '#0044aa'
+  const shadowL = wallNudgeLeft  > 0.05 ? '#00ffff' : '#0066ff'
+  const shadowR = wallNudgeRight > 0.05 ? '#00ffff' : '#0066ff'
+
+  drawTiltedWallFill(wallCX_L, tL, shkL, colorL, shadowL)
+  drawTiltedWallFill(wallCX_R, -tR, shkR, colorR, shadowR)
+
+  // Top wall com shake vertical
   ctx.save()
-  ctx.globalAlpha = 0.4
-  ctx.shadowBlur = ws(0.6)
-
-  // Left wall — desloca para a esquerda quando pressionada
-  ctx.fillStyle = wallNudgeLeft  > 0.05 ? `hsl(${200 + wallNudgeLeft  * 40},100%,${50 + wallNudgeLeft  * 30}%)` : '#0044aa'
-  ctx.shadowColor = wallNudgeLeft  > 0.05 ? '#00ffff' : '#0066ff'
-  ctx.fillRect(wx(-FIELD_W / 2 - wt - nudgeOffL), wy(FIELD_H / 2 + wt), ws(wt), ws(FIELD_H + wt * 2 + 1))
-
-  // Right wall — desloca para a direita quando pressionada
-  ctx.fillStyle = wallNudgeRight > 0.05 ? `hsl(${200 + wallNudgeRight * 40},100%,${50 + wallNudgeRight * 30}%)` : '#0044aa'
-  ctx.shadowColor = wallNudgeRight > 0.05 ? '#00ffff' : '#0066ff'
-  ctx.fillRect(wx(FIELD_W / 2 + nudgeOffR), wy(FIELD_H / 2 + wt), ws(wt), ws(FIELD_H + wt * 2 + 1))
-
-  // Top wall
-  ctx.fillStyle = '#0044aa'; ctx.shadowColor = '#0066ff'
-  ctx.fillRect(wx(-FIELD_W / 2 - wt), wy(FIELD_H / 2 + wt), ws(FIELD_W + wt * 2), ws(wt))
+  ctx.globalAlpha = 0.4; ctx.shadowColor = '#0066ff'; ctx.shadowBlur = ws(0.6)
+  ctx.fillStyle = wallShakeTop > 0.05 ? `hsl(${200 + wallShakeTop * 40},100%,${50 + wallShakeTop * 20}%)` : '#0044aa'
+  ctx.fillRect(wx(-FIELD_W / 2 - wt), wy(FIELD_H / 2 + wt + shkT), ws(FIELD_W + wt * 2), ws(wt))
   ctx.restore()
 
-  // Neon inner edge glow
-  ctx.save()
-  ctx.lineWidth = 1.5
-  // Left edge
-  ctx.strokeStyle = wallNudgeLeft  > 0.05 ? `hsl(${180 + wallNudgeLeft  * 60},100%,70%)` : '#0088ff'
-  ctx.globalAlpha = 0.6 + wallNudgeLeft  * 0.35
-  ctx.shadowColor = ctx.strokeStyle
-  ctx.shadowBlur = 12 + wallNudgeLeft  * 24
-  ctx.beginPath()
-  ctx.moveTo(wx(-FIELD_W / 2 - nudgeOffL), wy(-FIELD_H / 2))
-  ctx.lineTo(wx(-FIELD_W / 2 - nudgeOffL), wy(FIELD_H / 2))
-  ctx.stroke()
-  // Right edge
-  ctx.strokeStyle = wallNudgeRight > 0.05 ? `hsl(${180 + wallNudgeRight * 60},100%,70%)` : '#0088ff'
-  ctx.globalAlpha = 0.6 + wallNudgeRight * 0.35
-  ctx.shadowColor = ctx.strokeStyle
-  ctx.shadowBlur = 12 + wallNudgeRight * 24
-  ctx.beginPath()
-  ctx.moveTo(wx(FIELD_W / 2 + nudgeOffR), wy(-FIELD_H / 2))
-  ctx.lineTo(wx(FIELD_W / 2 + nudgeOffR), wy(FIELD_H / 2))
-  ctx.stroke()
+  // Neon inner edge glow — inclinado igual ao fill
+  const edgeColorL = wallNudgeLeft  > 0.05 ? `hsl(${180 + wallNudgeLeft  * 60},100%,70%)` : '#0088ff'
+  const edgeColorR = wallNudgeRight > 0.05 ? `hsl(${180 + wallNudgeRight * 60},100%,70%)` : '#0088ff'
+  drawTiltedWallEdge(wallCX_L, tL, shkL, edgeColorL, 0.6 + wallNudgeLeft  * 0.35, 12 + wallNudgeLeft  * 24 + wallShakeLeft  * 18)
+  drawTiltedWallEdge(wallCX_R, -tR, shkR, edgeColorR, 0.6 + wallNudgeRight * 0.35, 12 + wallNudgeRight * 24 + wallShakeRight * 18)
+
   // Top edge
-  ctx.strokeStyle = '#0088ff'; ctx.globalAlpha = 0.6; ctx.shadowColor = '#0088ff'; ctx.shadowBlur = 12
+  ctx.save()
+  ctx.strokeStyle = wallShakeTop > 0.05 ? `hsl(${180 + wallShakeTop * 60},100%,70%)` : '#0088ff'
+  ctx.globalAlpha = 0.6 + wallShakeTop * 0.3
+  ctx.shadowColor = ctx.strokeStyle; ctx.shadowBlur = 12 + wallShakeTop * 20
+  ctx.lineWidth = 1.5
   ctx.beginPath()
-  ctx.moveTo(wx(-FIELD_W / 2), wy(FIELD_H / 2))
-  ctx.lineTo(wx(FIELD_W / 2), wy(FIELD_H / 2))
+  ctx.moveTo(wx(-FIELD_W / 2), wy(FIELD_H / 2 + shkT))
+  ctx.lineTo(wx( FIELD_W / 2), wy(FIELD_H / 2 + shkT))
   ctx.stroke()
   ctx.restore()
 }

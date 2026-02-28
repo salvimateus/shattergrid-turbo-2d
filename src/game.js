@@ -67,14 +67,14 @@ function applyDrop(t) {
     case 'slowmo':
       if (timeScaleTimer > 0)
         deactivateDropLog(timeScale < 1 ? 'slowmo' : 'fastmo')
-      timeScale = 0.4
+      timeScale = 0.7
       timeScaleTimer = 5 * 60
       timeAccum = 0
       break
     case 'fastmo':
       if (timeScaleTimer > 0)
         deactivateDropLog(timeScale < 1 ? 'slowmo' : 'fastmo')
-      timeScale = 2.0
+      timeScale = 1.3
       timeScaleTimer = 3 * 60
       timeAccum = 0
       break
@@ -200,6 +200,14 @@ function initGame() {
   ghostTimer = 0
   wallNudgeLeft = 0
   wallNudgeRight = 0
+  wallShakeLeft = 0
+  wallShakeRight = 0
+  wallShakeTop = 0
+  wallTiltLeft = 0
+  wallTiltRight = 0
+  prevAtLeftWall = false
+  prevAtRightWall = false
+  mouseX = 0
   canvas.style.filter = ''
   document.getElementById('crt-overlay').style.display = 'none'
   stopFilmNoise()
@@ -493,6 +501,47 @@ function update() {
   if (mouseX > maxX) wallNudgeRight = Math.min(1, wallNudgeRight + 0.12)
   else                wallNudgeRight = Math.max(0, wallNudgeRight - 0.06)
 
+  // Tilt das paredes: segue o nudge suavemente (eixo central → inclina a parede)
+  wallTiltLeft  += (wallNudgeLeft  * 0.22 - wallTiltLeft)  * 0.1
+  wallTiltRight += (wallNudgeRight * 0.22 - wallTiltRight) * 0.1
+
+  // Chacoalho das paredes: decai rápido a cada frame
+  wallShakeLeft  *= 0.76
+  wallShakeRight *= 0.76
+  wallShakeTop   *= 0.76
+
+
+
+  // Detecta primeiro contato do paddle com a parede lateral → dispara recoil + shake
+  const atLeftWall  = paddleX <= minX + 0.02
+  const atRightWall = paddleX >= maxX - 0.02
+  if (atLeftWall && !prevAtLeftWall) {
+    wallShakeLeft = Math.min(1, wallShakeLeft + 0.7)
+    // Partículas: saem da borda esquerda em direção ao interior
+    for (let i = 0; i < 7; i++) {
+      const oy = (Math.random() - 0.5) * paddleW * 0.7
+      _spawnRawParticle(
+        minX, currentPaddleY + oy,
+        0.06 + Math.random() * 0.09, (Math.random() - 0.5) * 0.06,
+        0x00ccff, 0.14 + Math.random() * 0.10, 0.022 + Math.random() * 0.018
+      )
+    }
+  }
+  if (atRightWall && !prevAtRightWall) {
+    wallShakeRight = Math.min(1, wallShakeRight + 0.7)
+    // Partículas: saem da borda direita em direção ao interior
+    for (let i = 0; i < 7; i++) {
+      const oy = (Math.random() - 0.5) * paddleW * 0.7
+      _spawnRawParticle(
+        maxX, currentPaddleY + oy,
+        -(0.06 + Math.random() * 0.09), (Math.random() - 0.5) * 0.06,
+        0x00ccff, 0.14 + Math.random() * 0.10, 0.022 + Math.random() * 0.018
+      )
+    }
+  }
+  prevAtLeftWall  = atLeftWall
+  prevAtRightWall = atRightWall
+
   if (charging) {
     updateCharge()
     updateDrops()
@@ -516,24 +565,30 @@ function update() {
     // Walls
     if (b.x - BALL_R < -FIELD_W / 2) {
       b.x = -FIELD_W / 2 + BALL_R
-      b.vx = Math.abs(b.vx)
-      // Mecânica de parede pressionada: boost vertical proporcional ao nudge
-      if (wallNudgeLeft > 0.05) {
-        b.vy += wallNudgeLeft * 0.045
-        b.vy = Math.min(b.vy, b.speed * 0.95)
-      }
+      // Reflexão com parede inclinada: normal = (cos(tilt), sin(tilt)) aponta pro interior
+      const tL = wallTiltLeft
+      const nLx = Math.cos(tL), nLy = Math.sin(tL)
+      const dotL = b.vx * nLx + b.vy * nLy
+      b.vx -= 2 * dotL * nLx
+      b.vy -= 2 * dotL * nLy
+      if (b.vx < 0) b.vx = Math.abs(b.vx) // garante afastamento da parede
+      b.vy = Math.max(-b.speed * 0.95, Math.min(b.speed * 0.95, b.vy))
+      wallShakeLeft = Math.min(1, wallShakeLeft + 0.9)
       shake(0.2 + wallNudgeLeft * 0.3)
       spawnP(b.x, b.y, wallNudgeLeft > 0.05 ? 0x00ffff : 0x0088ff, wallNudgeLeft > 0.05 ? 10 : 6)
       SFX.wallHit()
     }
     if (b.x + BALL_R > FIELD_W / 2) {
       b.x = FIELD_W / 2 - BALL_R
-      b.vx = -Math.abs(b.vx)
-      // Mecânica de parede pressionada: boost vertical proporcional ao nudge
-      if (wallNudgeRight > 0.05) {
-        b.vy += wallNudgeRight * 0.045
-        b.vy = Math.min(b.vy, b.speed * 0.95)
-      }
+      // Reflexão com parede inclinada: normal = (-cos(tilt), sin(tilt))
+      const tR = wallTiltRight
+      const nRx = -Math.cos(tR), nRy = Math.sin(tR)
+      const dotR = b.vx * nRx + b.vy * nRy
+      b.vx -= 2 * dotR * nRx
+      b.vy -= 2 * dotR * nRy
+      if (b.vx > 0) b.vx = -Math.abs(b.vx) // garante afastamento da parede
+      b.vy = Math.max(-b.speed * 0.95, Math.min(b.speed * 0.95, b.vy))
+      wallShakeRight = Math.min(1, wallShakeRight + 0.9)
       shake(0.2 + wallNudgeRight * 0.3)
       spawnP(b.x, b.y, wallNudgeRight > 0.05 ? 0x00ffff : 0x0088ff, wallNudgeRight > 0.05 ? 10 : 6)
       SFX.wallHit()
@@ -541,6 +596,7 @@ function update() {
     if (b.y + BALL_R > FIELD_H / 2) {
       b.y = FIELD_H / 2 - BALL_R
       b.vy = -Math.abs(b.vy)
+      wallShakeTop = Math.min(1, wallShakeTop + 0.9)
       shake(0.2)
       spawnP(b.x, b.y, 0x0088ff, 6)
       SFX.wallHit()
@@ -707,7 +763,11 @@ function animate(now) {
 
 // ═══ INPUT ═══
 document.addEventListener('mousemove', (e) => {
-  mouseX = screenToFieldX(e.clientX)
+  if (IS_MOBILE) return
+  // Desktop: movimento relativo — paddle anda o mesmo tanto que o mouse, independente da posição do cursor
+  const delta = Math.max(-80, Math.min(80, e.movementX))
+  mouseX += delta / scale
+  mouseX = Math.max(-FIELD_W / 2, Math.min(FIELD_W / 2, mouseX))
 })
 document.addEventListener(
   'touchmove',

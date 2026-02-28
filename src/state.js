@@ -21,3 +21,8 @@ let laserSightTimer = 0
 let spinTimer = 0, ghostTimer = 0
 // Pressão do paddle contra as paredes laterais (0..1)
 let wallNudgeLeft = 0, wallNudgeRight = 0
+// Chacoalho das paredes (decai rápido após impacto)
+let wallShakeLeft = 0, wallShakeRight = 0, wallShakeTop = 0
+// Ângulo de inclinação das paredes laterais (radians, gera pelo eixo central)
+let wallTiltLeft = 0, wallTiltRight = 0
+let prevAtLeftWall = false, prevAtRightWall = false
