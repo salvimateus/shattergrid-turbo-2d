@@ -4,6 +4,8 @@
 
 ![Gameplay: a combo of x45 with the INSANE label, bricks in three colors and the drop log at the right](docs/screenshots/gameplay-combo.png)
 
+**[Play the game in your browser](https://salvimateus.github.io/shattergrid-turbo-2d/shattergrid_turbo_2d.html)**
+
 ## What it is
 
 Shatter Grid Turbo 2D is a single-player brick breaker game. You move a paddle at the bottom of a neon field. You keep a glowing ball in play and break a wall of bricks.
@@ -95,6 +97,10 @@ A destroyed brick releases a drop with a chance of 65%. A maximum of 3 drops can
 
 ## Run the game
 
+Play online: [salvimateus.github.io/shattergrid-turbo-2d](https://salvimateus.github.io/shattergrid-turbo-2d/shattergrid_turbo_2d.html).
+
+To run a local copy:
+
 1. Download or clone the repository.
 2. Open `shattergrid_turbo_2d.html` in a modern web browser.
 
@@ -166,3 +172,7 @@ The build does these steps:
 - The game is playable from the start screen to the win screen and the game over screen.
 - It has one level. The brick layout is random for each game.
 - The repository has no release and no version number.
+
+## License
+
+This project is under the MIT License. See [LICENSE](LICENSE).
